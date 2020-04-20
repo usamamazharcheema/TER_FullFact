@@ -8,13 +8,16 @@ class Claim:
 		self.claim=unicode("")
 		self.body=unicode("")
 		self.conclusion=unicode("")
-		self.refered_links=""
+		self.related_posts=""
 		self.title=unicode("")
 		self.date=""
 		self.url=""
-		self.tags=""
+		self.rubrique=""
 		self.verdictTompo=""
 		self.html=False
+		self.idClaim=1
+		self.keyWordsRP=""
+
 
 
 	def setSource(self, str_):
@@ -33,8 +36,8 @@ class Claim:
 		self.conclusion = unicode(str_)
 		return self
 
-	def setRefered_links(self, str_):
-		self.refered_links = str_
+	def setRelated_posts(self, str_):
+		self.related_posts = unicode(str_)
 		return self
 
 	def setTitle(self, str_):
@@ -53,13 +56,29 @@ class Claim:
 		self.url = unicode(str_)
 		return self
 
-	def setTags(self, str_):
-		self.tags = str_
+	def setRubrique(self, str_):
+		self.rubrique = unicode(str_)
 
 	def setHtml(self, str_):
 		self.html = str_
 
+	def setIdClaim(self, n):
+		self.idClaim = n
+		return self
+
+	def setKeyWordsRP(self, str_):
+		self.keyWordsRP = unicode(str_)
+		return self
+
+	def getIdClaim(self):
+		return self.idClaim
+
+	def getRubrique(self):
+		return self.rubrique
+
 	
+
+
 
 	def getDict(self):
 		dict_={}
@@ -67,13 +86,15 @@ class Claim:
 		dict_['claim']=self.claim
 		dict_['body']=self.body.replace("\n","")
 		dict_['conclusion']=self.conclusion
-		dict_['refered_links']=self.refered_links
+		dict_['related_posts']=self.related_posts
 		dict_['title']=self.title
 		dict_['date']=self.date
 		dict_['url']=self.url
-		dict_['tags']=self.tags
+		dict_['rubrique']=self.rubrique
 		dict_['verdictTompo']=self.verdictTompo
+		dict_['idClaim']=self.idClaim
+		dict_['keyWordsRP']=self.keyWordsRP
+		#dict_['id']=self.composedClaim
 		if (self.html):
 			dict_['html']=self.html
 		return dict_
-

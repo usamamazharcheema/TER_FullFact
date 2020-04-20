@@ -11,14 +11,19 @@ import nltk
 #nltk.download('punkt')
 from nltk.corpus import wordnet as wn
 from py_thesaurus import Thesaurus
-import conc
+import brouillon
+import getPosts
+import additionalRows
+import lienPosts
+import string
+import pickle
 
-vP = ["true", "correct"]
-vN = ["false", "incorrect"]
+#vP = ["true", "correct"]
+#vN = ["false", "incorrect"]
 
-synoP=[]
-synoN=[]
-
+synoP=["correct", "right", "true", "evidence","quite", "accurate"]
+synoN=["incorrect", "false"]
+'''
 for p in vP:
 	for syn in wn.synsets(p):
 		for l in syn.lemmas():
@@ -28,19 +33,151 @@ for n in vN:
 	for syn in wn.synsets(n):
 		for l in syn.lemmas():
 			synoN.append(l.name())
-
+'''
 
 ponctuation=[".",",","!"]
 
+claims=[]
+urlTraite=[]
+urls_=[]
+idClaim=1
+
+fichier= open("conclusion.txt", "a")
+
+rubriquesClaim=["economy", "health", "online", "europe"]
+rubEconomy= []
+rubHealth=[]
+rubOnline=[]
+rubEurope=[]
+
+
+def triClaimsParRubrique(rubri, uri, claim, title):
+	global rubEconomy, rubHealth, rubOnline, rubEurope
+	cl=[]
+	cl.append(rubri)
+	cl.append(uri)
+	c=(claim.replace("\n", "")).replace(".", "")
+	cl.append(c)
+	cl.append(title)
+	print(cl)
+	
+	if rubri == "economy":
+	 	rubEconomy.append(cl)
+	else:
+		if rubri == "health":
+			rubHealth.append(cl)
+		else:
+	 		if rubri == "online":
+	 			rubOnline.append(cl)
+	 		else:
+	 			if rubri == "europe":
+	 				rubEurope.append(cl)
+
+
+
+def exactractionClaim(page,url):
+	global urlTraite, urls_, claims, idClaim
+	print("url  "+ url)
+	soup = BeautifulSoup(page,"lxml")
+	soup.prettify()
+	claim_ =  claim_obj.Claim()
+
+	
+	
+	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
+	if claim :
+		claim_.setSource("fullfact")
+		claim_.setUrl("http://fullfact.org"+url)
+		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
+		claim_.setIdClaim(idClaim)
+			
+		
+		conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
+		if conclusion :
+			claim_.setConclusion(conclusion.get_text().replace("\nConclusion\n",""))
+			c=conclusion.get_text().replace("\nConclusion\n","")
+			#fichier.write("\n" + c)
+			claim_.setVerdictTompo(brouillon.fonctionPrincipale(c))
+	
+		
+		title = soup.find("div", {"class": "header col-xs-12 no-padding"})
+		if title:
+			t=title.find("h1").get_text()
+			claim_.setTitle(t)
+
+
+  	
+		body = soup.find("div", {"class": "article-post-content"})
+		if body :
+			claim_.setBody(body.get_text())
+
+
+		categories = soup.find('ol', {"class": "breadcrumb"}) 
+		if categories:
+			rub=[]
+			for c in categories.findAll('a', href=True):
+				rub.append(c['href'])
+			rubrique=rub[-1].split('/') 
+			rubri=rubrique[1]
+			claim_.setRubrique(rubri)
+			triClaimsParRubrique(rubri, "http://fullfact.org"+url, claim.get_text().replace("\nClaim\n",""), title.find("h1").get_text())
+
+
+		relp = getPosts.getRelatedPosts(soup)
+		claim_.setRelated_posts(relp) 
+		l=lienPosts.fonctionPRelatedPosts(relp)
+		print("sujets en commun: " + str(l))
+		claim_.setKeyWordsRP(l)
+
+		
+		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
+		if autresClaims:
+			for row in autresClaims:
+				c=additionalRows.briefAdditionalRows(row, body, url, idClaim, relp, rubri, l, t)
+				if c != "empty":
+					claims.append(c.getDict())
+		idClaim+=1
+
+
+			
+		if len(relp)!=0 :
+			for r in relp:
+				if not (r[1] in urlTraite):
+					try:
+						page = urlopen("http://fullfact.org"+r[1]).read()
+						urlTraite.append(r[1])
+						print("url de related posts\n")
+						exactractionClaim(page, r[1])
+					except:
+						continue
+
+		claims.append(claim_.getDict())
+
+
+	else :
+		ls = soup.findAll('a', href=True)
+		if len(ls) != 0:
+			for anchor in ls:
+				if (not(anchor['href'] in urls_ ) and not(anchor['href'] in urlTraite) ):
+					urls_.append(anchor['href'])
+					print ("page sans claim ! "+str(anchor['href']))
+
+
+
+
+
+
+
+
 def get_all_claims(criteria):
 	
+	global urls_, urlTraite, idClaim, rubEconomy, rubHealth, rubOnline, rubEurope
 
-	#performing a search by each letter, and adding each article to a urls_ var.
 
-	#alfab="bc"
-	urls_=[]
+
 	u=[]
-
+	
+ 
 	page = urlopen("http://fullfact.org").read()
 
 	#soup = browser.execute_script("return document.body.innerHTML")
@@ -59,94 +196,66 @@ def get_all_claims(criteria):
 
 	if len(links) != 0:
 		for anchor in links:
-			if (not(str(anchor['href']) in urls_ ) ):
+			if (not(anchor['href'] in urls_ ) ):
 				urls_.append(anchor['href'])
 				print ("adding "+str(anchor['href']))
 			
 	else:
 	    print ("break!")
 	    	
-	claims=[]
+
 	index=0
 	# visiting each article's dictionary and extract the content.
 	for url in urls_:
-		if (not(url in u)):
-			if(index < 200):
-				print("je suis la \n")
-				print (str(index) + "/" + str(len(urls_))+ " extracting "+str(url))
+		if (not(url in u) and not (url in urlTraite)):
+			if(index < 700):
+				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(url))
 				url_complete="http://fullfact.org"+url
-				try :
-					page = urlopen(url_complete).read()
-				except :
-					continue
-				index+=1
-				claim_ =  claim_obj.Claim()
 	
+				try :
+
+					page = urlopen(url_complete).read()
+					urlTraite.append(url)
+					exactractionClaim(page,url)
+					index+=1
+				except :
+					print("try \n")
+					continue
+
+		else: 
+			continue
+
+				
+	print(rubEconomy)
+	pp=lienPosts.fonctionPRelatedPosts(rubEconomy)
+	print(pp)
 
 		
-				print("url récupérée "+ url_complete)
-				soup = BeautifulSoup(page,"lxml")
-				soup.prettify()
-
-		
-
-		#claim
-				claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
-				if claim :
-					claim_.setSource("fullfact")
-					claim_.setUrl(url_complete)
-					claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
-
-					conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
-					if conclusion :
-						claim_.setConclusion(conclusion.get_text().replace("\nConclusion\n",""))
-						c=conclusion.get_text().replace("\nConclusion\n","")
-						claim_.setVerdictTompo(conc.exactractionDirect(synoP, synoN, c, ponctuation))
-		    
-		    
-		#title
-					#title=soup.find("div", {"class": "header col-xs-12 no-padding"})
-					#t=title.find("h1")
-					#if title :
-					#	claim_.setTitle(t.string.strip())mon
-
-
-		#date
-					date=soup.find("p", {"class": "visible-xs visible-sm date updated"})
-					if date :
-						claim_.setDate(dateparser.parse(date.get_text().replace("Published:","")).strftime("%Y-%m-%d"))
-						print("je suis dans date"+claim_.date)
-
-		
-			#body
-					body = soup.find("div", {"class": "article-post-content"})
-					if body :
-						claim_.setBody(body.get_text())
-
-
-		#related links
-					divTag = soup.find("div", {"class": "row"})
-					related_links=[]
-					if divTag :
-						for link in divTag.findAll('a', href=True):
-							if link :
-								related_links.append(link['href'])
-						if related_links :
-							claim_.setRefered_links(related_links)
 
 
 
-					claims.append(claim_.getDict())
-				else :
-					ls = soup.findAll('a', href=True)
-					if len(ls) != 0:
-		
-						for anchor in ls:
-							if (not(str(anchor['href']) in urls_ ) ):
-								urls_.append(anchor['href'])
-								print ("adding "+str(anchor['href']))
-
-    
-    #creating a pandas dataframe
 	pdf=pd.DataFrame(claims)
+	with open('economy', 'wb') as fichier:
+		mon_pickler = pickle.Pickler(fichier)
+		mon_pickler.dump(rubEconomy)
+	fichier.close()
+
+	
+	with open('europe', 'wb') as fichier:
+		mon_pickler = pickle.Pickler(fichier)
+		mon_pickler.dump(rubEurope)
+	fichier.close()
+
+	with open('online', 'wb') as fichier:
+		mon_pickler = pickle.Pickler(fichier)
+		mon_pickler.dump(rubOnline)
+	fichier.close()
+
+	'''print("\n")
+	print(urls_)
+	print("\n")	
+	print(urlTraite)'''
+
+
 	return pdf
+    
