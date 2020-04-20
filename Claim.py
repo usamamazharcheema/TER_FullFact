@@ -17,6 +17,7 @@ class Claim:
 		self.html=False
 		self.idClaim=1
 		self.keyWordsRP=""
+		self.related_posts=""
 
 
 
