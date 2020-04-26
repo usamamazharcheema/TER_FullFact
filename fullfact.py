@@ -16,8 +16,6 @@ import getPosts
 import additionalRows
 import lienPosts
 import string
-import pickle
-
 #vP = ["true", "correct"]
 #vN = ["false", "incorrect"]
 
@@ -59,7 +57,7 @@ def triClaimsParRubrique(rubri, uri, claim, title):
 	c=(claim.replace("\n", "")).replace(".", "")
 	cl.append(c)
 	cl.append(title)
-	print(cl)
+	#print(cl)
 	
 	if rubri == "economy":
 	 	rubEconomy.append(cl)
@@ -125,7 +123,7 @@ def exactractionClaim(page,url):
 
 		relp = getPosts.getRelatedPosts(soup)
 		claim_.setRelated_posts(relp) 
-		l=lienPosts.fonctionPRelatedPosts(relp)
+		l=lienPosts.fonctionPRelatedPosts(relp, 1)
 		print("sujets en commun: " + str(l))
 		claim_.setKeyWordsRP(l)
 
@@ -208,7 +206,7 @@ def get_all_claims(criteria):
 	# visiting each article's dictionary and extract the content.
 	for url in urls_:
 		if (not(url in u) and not (url in urlTraite)):
-			if(index < 700):
+			if(index < 200):
 				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(url))
 				url_complete="http://fullfact.org"+url
 	
@@ -226,8 +224,9 @@ def get_all_claims(criteria):
 			continue
 
 				
-	print(rubEconomy)
-	pp=lienPosts.fonctionPRelatedPosts(rubEconomy)
+	print(rubHealth)
+	print(len(rubHealth))
+	pp=lienPosts.fonctionPRelatedPosts(rubHealth, 3)
 	print(pp)
 
 		
@@ -235,27 +234,10 @@ def get_all_claims(criteria):
 
 
 	pdf=pd.DataFrame(claims)
-	with open('economy', 'wb') as fichier:
-		mon_pickler = pickle.Pickler(fichier)
-		mon_pickler.dump(rubEconomy)
-	fichier.close()
-
-	
-	with open('europe', 'wb') as fichier:
-		mon_pickler = pickle.Pickler(fichier)
-		mon_pickler.dump(rubEurope)
-	fichier.close()
-
-	with open('online', 'wb') as fichier:
-		mon_pickler = pickle.Pickler(fichier)
-		mon_pickler.dump(rubOnline)
-	fichier.close()
 
 	'''print("\n")
 	print(urls_)
 	print("\n")	
 	print(urlTraite)'''
-
-
 	return pdf
     
