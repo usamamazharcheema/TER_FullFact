@@ -107,7 +107,17 @@ def exactractionClaim(page,url):
   	
 		body = soup.find("div", {"class": "article-post-content"})
 		if body :
-			claim_.setBody(body.get_text())
+			liensRevue=[]
+			text=[]
+			bod=body.find("div", {"class": "col-xs-12 no-padding"})
+			for b in bod.findAll("p"):
+				for link in b.findAll('a', href=True):
+					liensRevue.append(link['href'])
+				text.append(b.get_text())
+			result= " ".join(text) 
+			print(liensRevue)
+			claim_.setLiensRevue(liensRevue)
+			claim_.setBody(result)
 
 
 		categories = soup.find('ol', {"class": "breadcrumb"}) 
@@ -131,7 +141,7 @@ def exactractionClaim(page,url):
 		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
 		if autresClaims:
 			for row in autresClaims:
-				c=additionalRows.briefAdditionalRows(row, body, url, idClaim, relp, rubri, l, t)
+				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, relp, rubri, l, t, liensRevue)
 				if c != "empty":
 					claims.append(c.getDict())
 		idClaim+=1
@@ -206,7 +216,7 @@ def get_all_claims(criteria):
 	# visiting each article's dictionary and extract the content.
 	for url in urls_:
 		if (not(url in u) and not (url in urlTraite)):
-			if(index < 200):
+			if(index < 60):
 				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(url))
 				url_complete="http://fullfact.org"+url
 	
@@ -225,7 +235,10 @@ def get_all_claims(criteria):
 
 				
 	print(rubHealth)
-	print(len(rubHealth))
+	#print(rubEconomy)
+	#print(rubEurope)
+	#print(rubOnline)
+
 	pp=lienPosts.fonctionPRelatedPosts(rubHealth, 3)
 	print(pp)
 

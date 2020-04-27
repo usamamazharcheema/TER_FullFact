@@ -16,7 +16,7 @@ import brouillon
 
 
 
-def briefAdditionalRows(soup, body,url, idClaim, relp, rubri, l, t):
+def briefAdditionalRows(soup, result,url, idClaim, relp, rubri, l, t, liensRevue):
 
 	claim_ =  claim_obj.Claim()	
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
@@ -36,8 +36,9 @@ def briefAdditionalRows(soup, body,url, idClaim, relp, rubri, l, t):
 			c=conclusion.get_text().replace("\nConclusion\n","")
 			claim_.setVerdictTompo(brouillon.fonctionPrincipale(c))
 
-		claim_.setBody(body.get_text())
+		claim_.setBody(result)
 		claim_.setRelated_posts(relp) 
+		claim_.setLiensRevue(liensRevue)
 		return claim_
 	else:
 		return "empty"

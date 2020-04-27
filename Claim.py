@@ -17,7 +17,7 @@ class Claim:
 		self.html=False
 		self.idClaim=1
 		self.keyWordsRP=""
-		self.related_posts=""
+		self.liens_revue=""
 
 
 
@@ -77,6 +77,10 @@ class Claim:
 	def getRubrique(self):
 		return self.rubrique
 
+	def setLiensRevue(self, str_):
+		self.liens_revue = unicode(str_)
+		return self
+
 	
 
 
@@ -95,6 +99,7 @@ class Claim:
 		dict_['verdictTompo']=self.verdictTompo
 		dict_['idClaim']=self.idClaim
 		dict_['keyWordsRP']=self.keyWordsRP
+		dict_['liens_revue']=self.liens_revue
 		#dict_['id']=self.composedClaim
 		if (self.html):
 			dict_['html']=self.html
