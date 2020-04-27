@@ -36,6 +36,10 @@ for n in vN:
 ponctuation=[".",",","!"]
 
 claims=[]
+claimsEconomy=[]
+claimsHealth=[]
+claimsOnline=[]
+claimsEurope=[]
 urlTraite=[]
 urls_=[]
 idClaim=1
@@ -43,33 +47,24 @@ idClaim=1
 fichier= open("conclusion.txt", "a")
 
 rubriquesClaim=["economy", "health", "online", "europe"]
-rubEconomy= []
-rubHealth=[]
-rubOnline=[]
-rubEurope=[]
 
 
-def triClaimsParRubrique(rubri, uri, claim, title):
-	global rubEconomy, rubHealth, rubOnline, rubEurope
-	cl=[]
-	cl.append(rubri)
-	cl.append(uri)
-	c=(claim.replace("\n", "")).replace(".", "")
-	cl.append(c)
-	cl.append(title)
-	#print(cl)
-	
+
+def triClaimsParRubrique(rubri, claim):
+	global claimsEconomy, claimsHealth, claimsOnline, claimsEurope
+	print("*************** Fonction triClaimsParRubrique ******************************")
+	print(rubri)
 	if rubri == "economy":
-	 	rubEconomy.append(cl)
+		claimsEconomy.append(claim)
 	else:
 		if rubri == "health":
-			rubHealth.append(cl)
+			claimsHealth.append(claim)
 		else:
 	 		if rubri == "online":
-	 			rubOnline.append(cl)
+	 			claimsOnline.append(claim)
 	 		else:
 	 			if rubri == "europe":
-	 				rubEurope.append(cl)
+	 				claimsEurope.append(claim)
 
 
 
@@ -89,6 +84,7 @@ def exactractionClaim(page,url):
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
 		claim_.setIdClaim(idClaim)
 			
+		
 		
 		conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
 		if conclusion :
@@ -118,36 +114,42 @@ def exactractionClaim(page,url):
 			print(liensRevue)
 			claim_.setLiensRevue(liensRevue)
 			claim_.setBody(result)
+			
+
+		relp = getPosts.getRelatedPosts(soup)	
+		l=lienPosts.fonctionLiensRelatedPosts(relp, 1, "RelatedPosts")		
+		motsCles=l[-1]
+		del l[-1]
+		print("sujets en commun: " + str(motsCles))
+		print("\n")
+		print(l)
+		for liste in l :
+			claim_.setRelated_posts(liste) 
+		claim_.setKeyWordsRP(motsCles)
+
+
+		print("-------------------------------------------------------------------")
+		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
+		if autresClaims:
+			for row in autresClaims:
+				c=additionalRows.briefAdditionalRows(row, body, url, idClaim, relp, rubri, l, t)
+				if c != "empty":
+					claims.append(c.getDict())
+		idClaim+=1
 
 
 		categories = soup.find('ol', {"class": "breadcrumb"}) 
-		if categories:
+		if categories:		
 			rub=[]
 			for c in categories.findAll('a', href=True):
 				rub.append(c['href'])
 			rubrique=rub[-1].split('/') 
 			rubri=rubrique[1]
 			claim_.setRubrique(rubri)
-			triClaimsParRubrique(rubri, "http://fullfact.org"+url, claim.get_text().replace("\nClaim\n",""), title.find("h1").get_text())
-
-
-		relp = getPosts.getRelatedPosts(soup)
-		claim_.setRelated_posts(relp) 
-		l=lienPosts.fonctionPRelatedPosts(relp, 1)
-		print("sujets en commun: " + str(l))
-		claim_.setKeyWordsRP(l)
-
-		
-		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
-		if autresClaims:
-			for row in autresClaims:
-				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, relp, rubri, l, t, liensRevue)
-				if c != "empty":
-					claims.append(c.getDict())
-		idClaim+=1
-
-
+			print("--------------------interieur de categorie ----------------------------")
+			triClaimsParRubrique(rubri, claim_)
 			
+		
 		if len(relp)!=0 :
 			for r in relp:
 				if not (r[1] in urlTraite):
@@ -159,7 +161,8 @@ def exactractionClaim(page,url):
 					except:
 						continue
 
-		claims.append(claim_.getDict())
+
+		#claims.append(claim_.getDict())
 
 
 	else :
@@ -233,20 +236,20 @@ def get_all_claims(criteria):
 		else: 
 			continue
 
-				
-	print(rubHealth)
-	#print(rubEconomy)
-	#print(rubEurope)
-	#print(rubOnline)
 
-	pp=lienPosts.fonctionPRelatedPosts(rubHealth, 3)
-	print(pp)
-
-		
-
+	print(claimsEconomy)
+	print(claimsHealth)
+	print(claimsEurope)
+	print(claimsOnline)
+	#cEconomy=lienPosts.fonctionLiensRubrique(3, "Economy", claimsEconomy)
+	cHealth=lienPosts.fonctionLiensRubrique(3, "Health", claimsHealth)
+	#cEurope=lienPosts.fonctionLiensRubrique( 3, "Europe", claimsEurope)
+	cOnline=lienPosts.fonctionLiensRubrique(3, "Online", claimsOnline)
 
 
-	pdf=pd.DataFrame(claims)
+	print("---------------fullfact------------")
+	print(cHealth)
+	pdf=pd.DataFrame(cHealth + cOnline)
 
 	'''print("\n")
 	print(urls_)
