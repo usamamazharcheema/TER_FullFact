@@ -8,7 +8,7 @@ class Claim:
 		self.claim=unicode("")
 		self.body=unicode("")
 		self.conclusion=unicode("")
-		self.related_posts=""
+		self.related_posts=[]
 		self.title=unicode("")
 		self.date=""
 		self.url=""
@@ -16,7 +16,7 @@ class Claim:
 		self.verdictTompo=""
 		self.html=False
 		self.idClaim=1
-		self.keyWordsRP=""
+		self.keyWordsRP=[]
 		self.liens_revue=""
 
 
@@ -38,7 +38,7 @@ class Claim:
 		return self
 
 	def setRelated_posts(self, str_):
-		self.related_posts = unicode(str_)
+		self.related_posts.append(str_)
 		return self
 
 	def setTitle(self, str_):
@@ -68,8 +68,18 @@ class Claim:
 		return self
 
 	def setKeyWordsRP(self, str_):
-		self.keyWordsRP = unicode(str_)
+		self.keyWordsRP.append(str_)
 		return self
+
+	def getClaim(self):
+		return self.claim
+
+	def getTitle(self):
+		return self.title
+
+	def getUrl(self):
+		return self.url
+
 
 	def getIdClaim(self):
 		return self.idClaim
@@ -91,13 +101,13 @@ class Claim:
 		dict_['claim']=self.claim
 		dict_['body']=self.body.replace("\n","")
 		dict_['conclusion']=self.conclusion
-		dict_['related_posts']=self.related_posts
 		dict_['title']=self.title
 		dict_['date']=self.date
 		dict_['url']=self.url
 		dict_['rubrique']=self.rubrique
 		dict_['verdictTompo']=self.verdictTompo
 		dict_['idClaim']=self.idClaim
+		dict_['related_posts']=self.related_posts
 		dict_['keyWordsRP']=self.keyWordsRP
 		dict_['liens_revue']=self.liens_revue
 		#dict_['id']=self.composedClaim
