@@ -16,26 +16,27 @@ import TraitementConclusion
 
 
 
-def briefAdditionalRows(soup, result,url, idClaim, relp, rubri, l, t, liensRevue):
+def briefAdditionalRows(soup, result, url, idClaim, relp, rubri, l, t, liensRevue):
 
 	claim_ =  claim_obj.Claim()	
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
 	if claim :
 		claim_.setSource("fullfact")
-		claim_.setUrl("http://fullfact.org"+url.replace("?utm_source=content_page&utm_medium=related_content",""))
+		claim_.setUrl("http://fullfact.org"+url)
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
 		claim_.setIdClaim(idClaim)
 		claim_.setRubrique(rubri)
 		claim_.setKeyWordsRP(l)
 		claim_.setTitle(t)
-		
+
 
 		conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
 		if conclusion :
 			claim_.setConclusion(conclusion.get_text().replace("\nConclusion\n",""))
 			c=conclusion.get_text().replace("\nConclusion\n","")
-			claim_.setVerdictTompo(brouillon.fonctionPrincipale(c))
+			claim_.setVerdictTompo(TraitementConclusion.fonctionPrincipale(c))
 
+		
 		claim_.setBody(result)
 		claim_.setRelated_posts(relp) 
 		claim_.setLiensRevue(liensRevue)
