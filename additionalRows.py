@@ -11,7 +11,7 @@ import nltk
 #nltk.download('punkt')
 from nltk.corpus import wordnet as wn
 from py_thesaurus import Thesaurus
-import brouillon
+import TraitementConclusion
 
 
 

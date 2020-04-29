@@ -13,7 +13,7 @@ from nltk.corpus import wordnet as wn
 from py_thesaurus import Thesaurus
 import fullfact
 import socket
-import brouillon
+import TraitementConclusion
 
 
 """def getRelatedPosts(soup, claim_):

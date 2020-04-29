@@ -7,7 +7,7 @@ import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
-import brouillon
+import TraitementConclusion
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
@@ -31,9 +31,9 @@ stop_words = stopwords.words('english')
 def traitementPosts(post):
     tempo=[]
     resultat=[]
-    pos= brouillon.nettoyage(post)
-    pos=brouillon.lemmatization(pos)
-    result= brouillon.eliminationStopWords(pos)
+    pos= TraitementConclusion.nettoyage(post)
+    pos=TraitementConclusion.lemmatization(pos)
+    result= TraitementConclusion.eliminationStopWords(pos)
     result= [word for word in result if word not in ponctuation and word not in mots]  
     for r in result:
         if ("-" in r):
@@ -86,13 +86,13 @@ def traitementPostsRubrique(keyWords, posts, claims):
 def getLiensPosts(posts, true_k, rubrique):
     
     vectorizer = TfidfVectorizer()
-    res= vectorizer.fit_transform(posts)
+ 
 
     df = pd.DataFrame(
     data=vectorizer.fit_transform(posts).toarray(),
     columns=vectorizer.get_feature_names()
     )
-   
+    res= vectorizer.fit_transform(posts)
   
 
     model = KMeans(n_clusters=true_k)
