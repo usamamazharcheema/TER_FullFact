@@ -16,7 +16,7 @@ import TraitementConclusion
 
 
 
-def briefAdditionalRows(soup, result, url, idClaim, relp, rubri, l, t, liensRevue):
+def briefAdditionalRows(soup, result, url, idClaim, listeURL, rubri, motsCles, t, liensRevue):
 
 	claim_ =  claim_obj.Claim()	
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
@@ -26,7 +26,7 @@ def briefAdditionalRows(soup, result, url, idClaim, relp, rubri, l, t, liensRevu
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
 		claim_.setIdClaim(idClaim)
 		claim_.setRubrique(rubri)
-		claim_.setKeyWordsRP(l)
+		claim_.setKeyWordsRP(motsCles)
 		claim_.setTitle(t)
 
 
@@ -38,7 +38,7 @@ def briefAdditionalRows(soup, result, url, idClaim, relp, rubri, l, t, liensRevu
 
 		
 		claim_.setBody(result)
-		claim_.setRelated_posts(relp) 
+		claim_.setRelated_posts(listeURL) 
 		claim_.setLiensRevue(liensRevue)
 		return claim_
 	else:
