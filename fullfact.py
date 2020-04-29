@@ -22,37 +22,51 @@ synoN=["incorrect", "false"]
 ponctuation=[".",",","!"]
 
 claims=[]
-claimsEconomy=[]
-claimsHealth=[]
-claimsOnline=[]
-claimsEurope=[]
+#claimsEconomy=[]
+#claimsHealth=[]
+#claimsOnline=[]
+#claimsEurope=[]
 urlTraite=[]
 urls_=[]
 idClaim=1
 
-
+claimsParRubrique={}
 
 rubriquesClaim=["economy", "health", "online", "europe"]
 
 
 
+#def triClaimsParRubrique(rubri, claim):
+#	global claimsEconomy, claimsHealth, claimsOnline, claimsEurope
+#	print("*************** Fonction triClaimsParRubrique ******************************")
+#	print(rubri)
+#	if rubri == "economy":
+#		claimsEconomy.append(claim)
+#	else:
+#		if rubri == "health":
+#			claimsHealth.append(claim)
+#		else:
+#	 		if rubri == "online":
+#	 			claimsOnline.append(claim)
+#	 		else:
+#	 			if rubri == "europe":
+#	 				claimsEurope.append(claim)
+#	 			else:
+#	 				claims.append(claim.getDict())
+
+
 def triClaimsParRubrique(rubri, claim):
-	global claimsEconomy, claimsHealth, claimsOnline, claimsEurope
+	global claimsParRubrique
 	print("*************** Fonction triClaimsParRubrique ******************************")
 	print(rubri)
-	if rubri == "economy":
-		claimsEconomy.append(claim)
+	listeClaims=[]
+	if (not(rubri in claimsParRubrique)):
+		listeClaims.append(claim)
+		claimsParRubrique[rubri]= listeClaims
 	else:
-		if rubri == "health":
-			claimsHealth.append(claim)
-		else:
-	 		if rubri == "online":
-	 			claimsOnline.append(claim)
-	 		else:
-	 			if rubri == "europe":
-	 				claimsEurope.append(claim)
-	 			else:
-	 				claims.append(claim.getDict())
+		claimsParRubrique[rubri].append(claim)
+	
+
 
 
 #Fonction récursive qui extrait les entités qu'on stocke dans le csv.
@@ -117,15 +131,16 @@ def exactractionClaim(page,url):
 
 		#extraction des claims contenus dans la rubrique "related posts" du claim courant.
 		relp = getPosts.getRelatedPosts(soup)
-		print(relp)
 		#appel du programme qui extrait les mots clés/thématique pour lesquels les claims ont été mis en ensemble dans "related posts".
 		l=lienPosts.fonctionLiensRelatedPosts(relp, 1, "RelatedPosts")		
 		motsCles=l[-1]
 		del l[-1]
 		print("sujets en commun: " + str(motsCles))
-		#stockage des URL des claims de "related posts" et mots clés associés dans l'attribut relatesPosts du claim courant.
-		for liste in l :
-			claim_.setRelated_posts(liste) 
+		#stockage des URL des claims de "related posts" et mots clés associés dans l'attribut relatesPosts du claim courant
+		listeURL=[]
+		for liste in l:
+			listeURL.append("http://fullfact.org"+ liste)
+		claim_.setRelated_posts(listeURL) 
 		claim_.setKeyWordsRP(motsCles)
 
 
@@ -133,7 +148,7 @@ def exactractionClaim(page,url):
 		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
 		if autresClaims:
 			for row in autresClaims:
-				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, relp, rubri, motsCles, t, liensRevue)
+				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, listeURL, rubri, motsCles, t, liensRevue)
 				if c != "empty":
 					claims.append(c.getDict())
 		idClaim+=1
@@ -145,7 +160,7 @@ def exactractionClaim(page,url):
 		#appel récursif sur les claims de related posts.	
 		if len(relp)!=0 :
 			for r in relp:
-				r[1]=r[1].replace("?utm_source=content_page&utm_medium=related_content", " ")
+				
 				if not (r[1] in urlTraite):
 					try:
 						page = urlopen("http://fullfact.org"+r[1]).read()
@@ -197,7 +212,7 @@ def get_all_claims(criteria):
 	#parcourir des uri stockées et appel de la fonction "extractionClaim" pour l'extraction des entités des claims.
 	for url in urls_:
 		if (not (url in urlTraite)):
-			if(index < 300):
+			if(index < 100):
 				urlNettoye=url.replace("?utm_source=content_page&utm_medium=related_content"," ")
 				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(urlNettoye))
 				url_complete="http://fullfact.org"+urlNettoye
@@ -221,15 +236,21 @@ def get_all_claims(criteria):
 	#print(claimsEurope)
 	#print(claimsOnline)
 	
-	cEconomy=lienPosts.fonctionLiensRubrique(3, "Economy", claimsEconomy)
-	cHealth=lienPosts.fonctionLiensRubrique(3, "Health", claimsHealth)
-	cEurope=lienPosts.fonctionLiensRubrique( 3, "Europe", claimsEurope)
-	cOnline=lienPosts.fonctionLiensRubrique(3, "Online", claimsOnline)
+	#cEconomy=lienPosts.fonctionLiensRubrique(3, "Economy", claimsEconomy)
+	#cHealth=lienPosts.fonctionLiensRubrique(3, "Health", claimsHealth)
+	#cEurope=lienPosts.fonctionLiensRubrique( 3, "Europe", claimsEurope)
+	#cOnline=lienPosts.fonctionLiensRubrique(3, "Online", claimsOnline)
+
+	cRubriques=[]
+	for cle, valeur in claimsParRubrique.items():
+		cRubriques= cRubriques+ lienPosts.fonctionLiensRubrique(3, cle, valeur)
+
+
 
 
 	print("---------------fullfact------------")
 	#print(cHealth)
-	pdf=pd.DataFrame(cEconomy +cEurope + cOnline + claims + cHealth)
+	pdf=pd.DataFrame(cRubriques+ claims)
 
 
 	return pdf
