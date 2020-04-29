@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-#import urllib2
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
@@ -8,7 +7,6 @@ import Claim as claim_obj
 from selenium import webdriver
 from nltk import word_tokenize
 import nltk
-#nltk.download('punkt')
 from nltk.corpus import wordnet as wn
 from py_thesaurus import Thesaurus
 import TraitementConclusion
@@ -59,7 +57,7 @@ def triClaimsParRubrique(rubri, claim):
 	 				claims.append(claim.getDict())
 
 
-#Fonction récursive qui scrappe 
+#Fonction récursive qui extrait les entités qu'on stocke dans le csv.
 def exactractionClaim(page,url):
 	global urlTraite, urls_, claims, idClaim
 	print("url  "+ url)
@@ -69,6 +67,7 @@ def exactractionClaim(page,url):
 
 	
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
+	#si la page contient une claim et une conclusion.
 	if claim :
 		claim_.setSource("fullfact")
 		claim_.setUrl("http://fullfact.org"+url)
@@ -76,25 +75,26 @@ def exactractionClaim(page,url):
 		claim_.setIdClaim(idClaim)
 			
 		
-		
+		#texte de la conclusion.
 		conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
 		if conclusion :
 			claim_.setConclusion(conclusion.get_text().replace("\nConclusion\n",""))
 			c=conclusion.get_text().replace("\nConclusion\n","")
 			claim_.setVerdictTompo(TraitementConclusion.fonctionPrincipale(c))
 	
-		
+		#titre du claim
 		#title = soup.find("div", {"class": "header col-xs-12 no-padding"})
 		#if title:
 		#	t=title.find("h1").get_text()
 		#	claim_.setTitle(t)
 
 
-  	
+  		#texte de la revue.
 		body = soup.find("div", {"class": "article-post-content"})
 		if body :
 			claim_.setBody(body.get_text())
 
+		#extraction du nom de la rubrique du claim.
 		categories = soup.find('ol', {"class": "breadcrumb"}) 
 		if categories:
 		
@@ -108,8 +108,9 @@ def exactractionClaim(page,url):
 			claim_.setRubrique(rubri)
 
 
+		#extraction des claims contenus dans la rubrique "related posts" du claim courant.
 		relp = getPosts.getRelatedPosts(soup)
-	
+		#appel du programme qui extrait les mots clés/thématique pour lesquels les claims ont été mis en ensemble dans "related posts".
 		l=lienPosts.fonctionLiensRelatedPosts(relp, 1, "RelatedPosts")
 		
 		
@@ -118,10 +119,13 @@ def exactractionClaim(page,url):
 		print("sujets en commun: " + str(motsCles))
 		print("\n")
 		print(l)
+		#stockage des URL des claims de "related posts" et mots clés associés dans l'attribut relatesPosts du claim courant.
 		for liste in l :
 			claim_.setRelated_posts(liste) 
 		claim_.setKeyWordsRP(motsCles)
 
+
+		#Cas où il y a plusieurs claims/conclusions traitées par la même revue.
 		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
 		if autresClaims:
 			for row in autresClaims:
@@ -131,9 +135,10 @@ def exactractionClaim(page,url):
 		idClaim+=1
 
 	
-		
+		#stockage du claim courant dans la rubrique associée (necéssaire dans l'étape de clustering pour déduire s'il y a une relation entre claims de même rubrique).
 		triClaimsParRubrique(rubri, claim_)
-			
+		
+		#appel récursif sur les claims de related posts.	
 		if len(relp)!=0 :
 			for r in relp:
 				if not (r[1] in urlTraite):
@@ -146,20 +151,17 @@ def exactractionClaim(page,url):
 						continue
 
 
-		#claims.append(claim_.getDict())
+	
 
-
+	#Si la page qu'on scrappe ne contient pas de claim/conclusion, juste une revue.
 	else :
-		print ("page :   "+url+"   sans claim !")
+		print ("page :    http://fullfact.org"+url+"   sans claim !")
 		ls = soup.findAll('a', href=True)
 		if len(ls) != 0:
 			for anchor in ls:
 				if (not(anchor['href'] in urls_ ) and not(anchor['href'] in urlTraite) ):
 					urls_.append(anchor['href'])
 					
-
-
-
 
 
 
@@ -173,7 +175,8 @@ def get_all_claims(criteria):
 	
 
 	index=0
-	# visiting each article's dictionary and extract the content.
+	#scrapping du site catégorie par catégorie et rajout des uri trouvées dans "url_" pour les parcourir après.
+	#à noter que qu'on garde que les uri commmençant par le nom d'une catégorie car les les autres ne correspondent pas aux pages de claims.
 	for rub in rubriques:
 		p = urlopen("http://fullfact.org"+rub).read()
 		soup = BeautifulSoup(p,"lxml")
@@ -186,9 +189,10 @@ def get_all_claims(criteria):
 			
 		else:
 			print ("break!")
+	#parcourir des uri stockées et appel de la fonction "extractionClaim" pour l'extraction des entités des claims.
 	for url in urls_:
 		if (not (url in urlTraite)):
-			if(index < 50):
+			if(index < 450):
 				urlNettoye=url.replace("?utm_source=content_page&utm_medium=related_content","")
 				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(urlNettoye))
 				url_complete="http://fullfact.org"+urlNettoye
