@@ -71,7 +71,7 @@ def traitementRelatedPosts(relp, keyWords, posts):
 def traitementPostsRubrique(keyWords, posts, claims):
     
     for c in claims:
-        if(c.getRubrique() not in categorie and v[0] not in keyWords):
+        if(c.getRubrique() not in categorie and c.getRubrique() not in keyWords):
             keyWords.append(c.getRubrique())
         post= c.getTitle() + " " + c.getClaim()
         post= post.replace(".", "")
@@ -96,7 +96,7 @@ def getLiensPosts(posts, true_k, rubrique):
   
 
     model = KMeans(n_clusters=true_k)
-    model.fit(res)
+    model.fit(res.reshape(-1, 1))
     
     kmeans_indices = model.fit_predict(res)
     #print(posts)
