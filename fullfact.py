@@ -82,27 +82,36 @@ def exactractionClaim(page,url):
 			c=conclusion.get_text().replace("\nConclusion\n","")
 			claim_.setVerdictTompo(TraitementConclusion.fonctionPrincipale(c))
 	
-		#titre du claim
-		#title = soup.find("div", {"class": "header col-xs-12 no-padding"})
-		#if title:
-		#	t=title.find("h1").get_text()
-		#	claim_.setTitle(t)
+			
+		title = soup.find("div", {"class": "header col-xs-12 no-padding"})
+		if title:
+			t=title.find("h1").get_text()
+			claim_.setTitle(t)
 
 
   		#texte de la revue.
 		body = soup.find("div", {"class": "article-post-content"})
 		if body :
-			claim_.setBody(body.get_text())
+			liensRevue=[]
+			text=[]
+			bod=body.find("div", {"class": "col-xs-12 no-padding"})
+			for b in bod.findAll("p"):
+				for link in b.findAll('a', href=True):
+					liensRevue.append(link['href'])
+				text.append(b.get_text())
+			result= " ".join(text) 
+			print(liensRevue)
+			claim_.setLiensRevue(liensRevue)
+			claim_.setBody(result)
+		
 
 		#extraction du nom de la rubrique du claim.
 		categories = soup.find('ol', {"class": "breadcrumb"}) 
-		if categories:
-		
+		if categories:	
 			rub=[]
 			for c in categories.findAll('a', href=True):
 				rub.append(c.get_text())
 			print(rub) 
-
 			rubri=rub[1].lower()
 			print(rubri)
 			claim_.setRubrique(rubri)
@@ -111,9 +120,7 @@ def exactractionClaim(page,url):
 		#extraction des claims contenus dans la rubrique "related posts" du claim courant.
 		relp = getPosts.getRelatedPosts(soup)
 		#appel du programme qui extrait les mots clés/thématique pour lesquels les claims ont été mis en ensemble dans "related posts".
-		l=lienPosts.fonctionLiensRelatedPosts(relp, 1, "RelatedPosts")
-		
-		
+		l=lienPosts.fonctionLiensRelatedPosts(relp, 1, "RelatedPosts")		
 		motsCles=l[-1]
 		del l[-1]
 		print("sujets en commun: " + str(motsCles))
@@ -129,7 +136,7 @@ def exactractionClaim(page,url):
 		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
 		if autresClaims:
 			for row in autresClaims:
-				c=additionalRows.briefAdditionalRows(row, body, url, idClaim, relp, rubri, l, t)
+				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, relp, rubri, motCles, t, liensRevue)
 				if c != "empty":
 					claims.append(c.getDict())
 		idClaim+=1
