@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-#import urllib2
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
@@ -8,7 +7,6 @@ import Claim as claim_obj
 from selenium import webdriver
 from nltk import word_tokenize
 import nltk
-#nltk.download('punkt')
 from nltk.corpus import wordnet as wn
 from py_thesaurus import Thesaurus
 import TraitementConclusion
@@ -22,12 +20,12 @@ def briefAdditionalRows(soup, result, url, idClaim, listeURL, rubri, motsCles, t
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
 	if claim :
 		claim_.setSource("fullfact")
-		claim_.setUrl("http://fullfact.org"+url)
+		claim_.setUrl(url)
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
 		claim_.setIdClaim(idClaim)
 		claim_.setRubrique(rubri)
 		claim_.setKeyWordsRP(motsCles)
-		claim_.setTitle(t)
+		#claim_.setTitle(t)
 
 
 		conclusion = soup.find('div', {"class": "col-xs-12 col-sm-6 col-right"})
