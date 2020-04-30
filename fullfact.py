@@ -22,13 +22,11 @@ synoN=["incorrect", "false"]
 ponctuation=[".",",","!"]
 
 claims=[]
-#claimsEconomy=[]
-#claimsHealth=[]
-#claimsOnline=[]
-#claimsEurope=[]
+
 urlTraite=[]
 urls_=[]
 idClaim=1
+uriSansClaim=0
 
 claimsParRubrique={}
 
@@ -36,23 +34,7 @@ rubriquesClaim=["economy", "health", "online", "europe"]
 
 
 
-#def triClaimsParRubrique(rubri, claim):
-#	global claimsEconomy, claimsHealth, claimsOnline, claimsEurope
-#	print("*************** Fonction triClaimsParRubrique ******************************")
-#	print(rubri)
-#	if rubri == "economy":
-#		claimsEconomy.append(claim)
-#	else:
-#		if rubri == "health":
-#			claimsHealth.append(claim)
-#		else:
-#	 		if rubri == "online":
-#	 			claimsOnline.append(claim)
-#	 		else:
-#	 			if rubri == "europe":
-#	 				claimsEurope.append(claim)
-#	 			else:
-#	 				claims.append(claim.getDict())
+
 
 
 def triClaimsParRubrique(rubri, claim):
@@ -71,7 +53,7 @@ def triClaimsParRubrique(rubri, claim):
 
 #Fonction récursive qui extrait les entités qu'on stocke dans le csv.
 def exactractionClaim(page,url):
-	global urlTraite, urls_, claims, idClaim
+	global urlTraite, urls_, claims, idClaim, uriSansClaim
 	print("url  "+ url)
 	soup = BeautifulSoup(page,"lxml")
 	soup.prettify()
@@ -82,7 +64,7 @@ def exactractionClaim(page,url):
 	#si la page contient une claim et une conclusion.
 	if claim :
 		claim_.setSource("fullfact")
-		claim_.setUrl("http://fullfact.org"+url)
+		claim_.setUrl(url)
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))
 		claim_.setIdClaim(idClaim)
 			
@@ -136,10 +118,8 @@ def exactractionClaim(page,url):
 		motsCles=l[-1]
 		del l[-1]
 		print("sujets en commun: " + str(motsCles))
+
 		#stockage des URL des claims de "related posts" et mots clés associés dans l'attribut relatesPosts du claim courant
-		#listeURL=[]
-		#for liste in l:
-		#	listeURL.append(liste)
 		claim_.setRelated_posts("RelatedPosts", l) 
 		claim_.setKeyWordsRP("RelatedPosts",motsCles)
 
@@ -163,7 +143,7 @@ def exactractionClaim(page,url):
 				
 				if not (r[1] in urlTraite):
 					try:
-						page = urlopen("http://fullfact.org"+r[1]).read()
+						page = urlopen(r[1]).read()
 						urlTraite.append(r[1])
 						print("url de related posts")
 						exactractionClaim(page, r[1])
@@ -175,12 +155,14 @@ def exactractionClaim(page,url):
 
 	#Si la page qu'on scrappe ne contient pas de claim/conclusion, juste une revue.
 	else :
-		print ("page :    http://fullfact.org"+url+"   sans claim !")
+		uriSansClaim+=1
+		print ("page :  "+url+"   sans claim !")
 		ls = soup.findAll('a', href=True)
 		if len(ls) != 0:
 			for anchor in ls:
-				if (not(anchor['href'] in urls_ ) and not(anchor['href'] in urlTraite) ):
-					urls_.append(anchor['href'])
+				u="http://fullfact.org"+ anchor['href'].replace("?utm_source=content_page&utm_medium=related_content","")
+				if (not(u in urls_ ) and not(u in urlTraite) ):
+					urls_.append(u)
 					
 
 
@@ -193,8 +175,9 @@ def get_all_claims(criteria):
 	rubriques=["/law/","/economy/", "/europe/", "/health", "/online", "/crime/", "/immigration/", "/education/"]
 
 	#le nombre de claims qu'on veut récuperer à l'extraction.
-	nbClaims=60
-	#index=0
+	nbClaims=200
+
+
 	#scrapping du site catégorie par catégorie et rajout des uri trouvées dans "url_" pour les parcourir après.
 	#à noter que qu'on garde que les uri commmençant par le nom d'une catégorie car les les autres ne correspondent pas aux pages de claims.
 	for rub in rubriques:
@@ -204,25 +187,27 @@ def get_all_claims(criteria):
 		if len(links) != 0:
 			for anchor in links:
 				if (not(anchor['href'] in urls_ ) and anchor['href'].startswith(rub)):
-					urls_.append(anchor['href'])
+					url_complete="http://fullfact.org"+ anchor['href'].replace("?utm_source=content_page&utm_medium=related_content","")
+					urls_.append(url_complete)
 					print ("adding "+ anchor['href'])
 			
 		else:
 			print ("break!")
+
 	#parcourir des uri stockées et appel de la fonction "extractionClaim" pour l'extraction des entités des claims.
 	for url in urls_:
+		
 		if (not (url in urlTraite)):
 			if(len(urlTraite) < nbClaims):
-				urlNettoye=url.replace("?utm_source=content_page&utm_medium=related_content"," ")
-				print (str(len(urlTraite)) + "/" + str(nbClaims)+ " extracting http://fullfact.org" +str(urlNettoye))
-				url_complete="http://fullfact.org"+urlNettoye
+				print (str(len(urlTraite)) + "/" + str(nbClaims)+ " extracting "+str(url))
+			
 	
 				try :
 
-					page = urlopen(url_complete).read()				
-					urlTraite.append(urlNettoye)
-					exactractionClaim(page,urlNettoye)
-					index+=1
+					page = urlopen(url).read()				
+					urlTraite.append(url)
+					exactractionClaim(page,url)
+					
 				except :
 					print("Impossible d'ouvrir cette page ! \n")
 					continue
@@ -231,15 +216,7 @@ def get_all_claims(criteria):
 			continue
 
 
-	#print(claimsEconomy)
-	#print(claimsHealth)
-	#print(claimsEurope)
-	#print(claimsOnline)
-	
-	#cEconomy=lienPosts.fonctionLiensRubrique(3, "Economy", claimsEconomy)
-	#cHealth=lienPosts.fonctionLiensRubrique(3, "Health", claimsHealth)
-	#cEurope=lienPosts.fonctionLiensRubrique( 3, "Europe", claimsEurope)
-	#cOnline=lienPosts.fonctionLiensRubrique(3, "Online", claimsOnline)
+
 
 	cRubriques=[]
 	for cle, valeur in claimsParRubrique.items():
@@ -249,7 +226,8 @@ def get_all_claims(criteria):
 
 
 	print("---------------fullfact------------")
-	#print(cHealth)
+
+	print("URI sans claims :" +str(uriSansClaim) + "/"+str(nbClaims))
 	pdf=pd.DataFrame(cRubriques+ claims)
 
 
