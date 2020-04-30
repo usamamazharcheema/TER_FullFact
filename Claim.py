@@ -8,7 +8,7 @@ class Claim:
 		self.claim=unicode("")
 		self.body=unicode("")
 		self.conclusion=unicode("")
-		self.related_posts=[]
+		self.related_posts={}
 		self.title=unicode("")
 		self.date=""
 		self.url=""
@@ -16,7 +16,7 @@ class Claim:
 		self.verdictTompo=""
 		self.html=False
 		self.idClaim=1
-		self.keyWordsRP=[]
+		self.keyWordsRP={}
 		self.liens_revue=""
 
 
@@ -37,8 +37,8 @@ class Claim:
 		self.conclusion = unicode(str_)
 		return self
 
-	def setRelated_posts(self, str_):
-		self.related_posts.append(str_)
+	def setRelated_posts(self, cle, valeur):
+		self.related_posts[cle]=valeur
 		return self
 
 	def setTitle(self, str_):
@@ -67,8 +67,8 @@ class Claim:
 		self.idClaim = n
 		return self
 
-	def setKeyWordsRP(self, str_):
-		self.keyWordsRP.append(str_)
+	def setKeyWordsRP(self, cle, valeur):
+		self.keyWordsRP[cle]=valeur
 		return self
 
 	def getClaim(self):
