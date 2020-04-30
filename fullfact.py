@@ -98,7 +98,7 @@ def exactractionClaim(page,url):
 		title = soup.find("div", {"class": "header col-xs-12 no-padding"})
 		if title:
 			t=title.find("h1").get_text()
-			claim_.setTitle(t)
+			#claim_.setTitle(t)
 
 
   		#texte de la revue.
@@ -137,11 +137,11 @@ def exactractionClaim(page,url):
 		del l[-1]
 		print("sujets en commun: " + str(motsCles))
 		#stockage des URL des claims de "related posts" et mots clés associés dans l'attribut relatesPosts du claim courant
-		listeURL=[]
-		for liste in l:
-			listeURL.append("http://fullfact.org"+ liste)
-		claim_.setRelated_posts(listeURL) 
-		claim_.setKeyWordsRP(motsCles)
+		#listeURL=[]
+		#for liste in l:
+		#	listeURL.append(liste)
+		claim_.setRelated_posts("RelatedPosts", l) 
+		claim_.setKeyWordsRP("RelatedPosts",motsCles)
 
 
 		#Cas où il y a plusieurs claims/conclusions traitées par la même revue.
@@ -192,9 +192,9 @@ def get_all_claims(criteria):
 	global urls_, urlTraite, idClaim, claims,claimsEconomy, claimsHealth, claimsOnline, claimsEurope
 	rubriques=["/law/","/economy/", "/europe/", "/health", "/online", "/crime/", "/immigration/", "/education/"]
 
-	
-
-	index=0
+	#le nombre de claims qu'on veut récuperer à l'extraction.
+	nbClaims=60
+	#index=0
 	#scrapping du site catégorie par catégorie et rajout des uri trouvées dans "url_" pour les parcourir après.
 	#à noter que qu'on garde que les uri commmençant par le nom d'une catégorie car les les autres ne correspondent pas aux pages de claims.
 	for rub in rubriques:
@@ -212,9 +212,9 @@ def get_all_claims(criteria):
 	#parcourir des uri stockées et appel de la fonction "extractionClaim" pour l'extraction des entités des claims.
 	for url in urls_:
 		if (not (url in urlTraite)):
-			if(index < 100):
+			if(len(urlTraite) < nbClaims):
 				urlNettoye=url.replace("?utm_source=content_page&utm_medium=related_content"," ")
-				print (str(index) + "/" + str(len(urls_))+ " extracting http://fullfact.org" +str(urlNettoye))
+				print (str(len(urlTraite)) + "/" + str(nbClaims)+ " extracting http://fullfact.org" +str(urlNettoye))
 				url_complete="http://fullfact.org"+urlNettoye
 	
 				try :
@@ -243,7 +243,7 @@ def get_all_claims(criteria):
 
 	cRubriques=[]
 	for cle, valeur in claimsParRubrique.items():
-		cRubriques= cRubriques+ lienPosts.fonctionLiensRubrique(3, cle, valeur)
+		cRubriques= cRubriques+ lienPosts.fonctionLiensRubrique(1, cle, valeur)
 
 
 
