@@ -1,7 +1,5 @@
 import sys
-#import import_ipynb
 import pandas as pd
-#import urllib2
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
@@ -34,8 +32,8 @@ def getRelatedPosts(soup):
     if relPosts:
         for link in relPosts.findAll('a', href=True):
             if link :                
-                url= link['href'].replace("?utm_source=content_page&utm_medium=related_content","")
-                page = urlopen("http://fullfact.org" + url).read()
+                url= "http://fullfact.org" + link['href'].replace("?utm_source=content_page&utm_medium=related_content","")
+                page = urlopen(url).read()
                 s = BeautifulSoup(page,"lxml")
                 s.prettify()
                 claim = s.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
