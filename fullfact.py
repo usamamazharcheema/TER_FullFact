@@ -80,7 +80,15 @@ def exactractionClaim(page,url):
 		title = soup.find("div", {"class": "header col-xs-12 no-padding"})
 		if title:
 			t=title.find("h1").get_text()
-			#claim_.setTitle(t)
+			claim_.setTitle(t)
+
+
+
+		date = soup.find("p", {"class": "date"})
+		if date:
+			d=date.find("span").get_text()
+			claim_.setDate(d)
+
 
 
   		#texte de la revue.
@@ -128,7 +136,7 @@ def exactractionClaim(page,url):
 		autresClaims=soup.find_all('div', {"class": "briefAdditionalRows"})
 		if autresClaims:
 			for row in autresClaims:
-				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, listeURL, rubri, motsCles, t, liensRevue)
+				c=additionalRows.briefAdditionalRows(row, result, url, idClaim, l, rubri, motsCles, t, liensRevue, d)
 				if c != "empty":
 					claims.append(c.getDict())
 		idClaim+=1
