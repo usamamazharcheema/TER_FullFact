@@ -155,8 +155,8 @@ def recuperationElementsPredits(topMC, indices, true_k, claims):
         print(valeur)
         i=0
         while i < len(valeur)-1:
-            valeur[i].setRelated_posts( [w.getUrl() for w in valeur if w!=valeur[i] and w != valeur[len(valeur) -1]])
-            valeur[i].setKeyWordsRP(valeur[len(valeur)-1])
+            valeur[i].setRelated_posts("ClaimsSimilaires", [w.getUrl() for w in valeur if w!=valeur[i] and w != valeur[len(valeur) -1]])
+            valeur[i].setKeyWordsRP("ClaimsSimilaires",valeur[len(valeur)-1])
             cc.append(valeur[i].getDict())
             i+=1
     
