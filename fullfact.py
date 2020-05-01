@@ -9,7 +9,7 @@ import nltk
 import TraitementConclusion
 import getPosts
 import additionalRows
-import lienPosts
+import relationsEntreLesClaims
 import string
 
 
@@ -178,7 +178,7 @@ def get_all_claims(criteria):
 	rubriques=["/law/","/economy/", "/europe/", "/health", "/online", "/crime/", "/immigration/", "/education/"]
 
 	#le nombre de claims qu'on veut récuperer à l'extraction.
-	nbClaims=80
+	nbClaims=400
 
 
 	#scrapping du site catégorie par catégorie et rajout des uri trouvées dans "url_" pour les parcourir après.
