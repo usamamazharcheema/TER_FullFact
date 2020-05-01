@@ -1,11 +1,11 @@
 ## Prérequis 
 
 
-Le programme s'exécute sur Python 3.5 +. Les dépendances de package attendues sont répertoriées dans le fichier "requirements.txt" pour PIP. Pour les obtenir,  veuillez exécuter la commande suivante :
+Le programme s'exécute avec Python 3.5 +. Les dépendances de package attendues sont répertoriées dans le fichier `requirements.txt` pour PIP. Pour les obtenir,  veuillez exécuter la commande suivante :
 
 
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 
@@ -16,7 +16,7 @@ pip3 install -r requirements.txt
 Le  programme s’exécute grâce à la commande suivante :
 
 ```
-python3 Exporter.py --website  fullfact
+python Exporter.py --website  fullfact
 ```
 
 
