@@ -6,6 +6,8 @@ import claimextractor as ce
 import Criteria 
 
 
+#point d'entrée du programme
+
 def main(argv):
 	options={} 
 	criteria = Criteria.Criteria()
