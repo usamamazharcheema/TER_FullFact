@@ -49,4 +49,4 @@ python Exporter.py --website  fullfact
 
 ## Notes
 
-* Le fichier `output_got.csv` est un exemple du résultat obtenu après l'exécution du programme.
+* Le repertoire `results` contient un fichier `output_got.csv` qui est un exemple du résultat obtenu après l'exécution du programme.
