@@ -1,16 +1,22 @@
 ---------------------------------------Prérequis :-------------------------------------------------------------
+
+
 Le programme s'exécute sur Python 3.5 +. Les dépendances de package attendues sont répertoriées dans le fichier "requirements.txt" pour PIP. Pour les obtenir,  veuillez exécuter la commande suivante :
 pip3 install -r requirements.txt
 
 
 
 --------------------------------------Exécution du programme :------------------------------------------------
+
+
 Le  programme s’exécute grâce à la commande suivante :
 
  python3 Exporter.py --website  fullfact
 
 
 --------------------------------------Fichiers :---------------------------------------------------------------
+
+
 
 -Exporter.py: Le point d’entrée de notre projet (il contient la fonction “main”). Quant au reste des programmes, nous avons :
 
@@ -24,7 +30,7 @@ Le  programme s’exécute grâce à la commande suivante :
 -TraitementConclusion.py: ce programme détermine la valeur de véracité d’un claim (TRUE, FALSE, OTHER, MIXTURE) à partir de sa conclusion.
 
 
--lienPosts.py: ce programme détermine le lien entre les claims se trouvant dans la même section “related posts”, mais aussi le lien entre les différents claims d’une même rubrique.
+-relationsEntreLesClaims.py: ce programme détermine le lien entre les claims se trouvant dans la même section “related posts”, mais aussi le lien entre les différents claims d’une même rubrique.
 
 
 -additionalRows.py:récupère les claims/conclusions qui se trouvent dans une même revue.
