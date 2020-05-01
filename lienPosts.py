@@ -43,7 +43,6 @@ def traitementPosts(post):
                 result.append(k)
     clean_sample_list = [word for word in result if word]
     tempo=nltk.pos_tag(clean_sample_list)
-    #print(tempo)
     i=0
     while i < len(tempo):
         if (tempo[i][1] == 'NN' or tempo[i][1] == 'NNS'):
@@ -152,7 +151,6 @@ def recuperationElementsPredits(topMC, indices, true_k, claims):
         c[k].append(topMC[k])
    
     for valeur in c.values(): 
-        print(valeur)
         i=0
         while i < len(valeur)-1:
             valeur[i].setRelated_posts("ClaimsSimilaires", [w.getUrl() for w in valeur if w!=valeur[i] and w != valeur[len(valeur) -1]])
@@ -160,10 +158,7 @@ def recuperationElementsPredits(topMC, indices, true_k, claims):
             cc.append(valeur[i].getDict())
             i+=1
     
-    print("Je suis dans lienPosts")
-    print("\n")
-    #print (cc)
-    print("++++++++++++++++++++++++++++++++++++++++++++")
+ 
     return cc
 
 
