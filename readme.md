@@ -1,21 +1,26 @@
-##Prérequis 
+## Prérequis 
 
 
 Le programme s'exécute sur Python 3.5 +. Les dépendances de package attendues sont répertoriées dans le fichier "requirements.txt" pour PIP. Pour les obtenir,  veuillez exécuter la commande suivante :
 
 
-`pip3 install -r requirements.txt`
+```
+pip3 install -r requirements.txt
+```
 
 
-##Exécution du programme
+
+## Exécution du programme
 
 
 Le  programme s’exécute grâce à la commande suivante :
 
- `python3 Exporter.py --website  fullfact`
+```
+python3 Exporter.py --website  fullfact
+```
 
 
-##Fichiers
+## Fichiers
 
 
 
@@ -42,6 +47,6 @@ Le  programme s’exécute grâce à la commande suivante :
 
 * `claimextractor.py` : exporte le résultat de l’extraction en fichier CSV.
 
-##Notes
+## Notes
 
 * Le fichier `output_got.csv` est un exemple du résultat obtenu après l'exécution du programme.
