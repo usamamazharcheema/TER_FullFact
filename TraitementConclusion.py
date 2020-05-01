@@ -1,17 +1,14 @@
 import sys
 import pandas as pd
-#import import_ipynb
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
 import Claim as claim_obj
-from selenium import webdriver
 from nltk import word_tokenize , sent_tokenize 
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from py_thesaurus import Thesaurus
 import sklearn
 from sklearn.feature_extraction.text import CountVectorizer
 import inflect
@@ -39,14 +36,15 @@ for n in vN:
 			synoN.append(l.name())
 
 '''
-synoP=["correct", "right", "true", "evidence", "quite", "accurate", "necessarily"]
-synoN=["incorrect", "false", "fake", "wrong", "uncertain"]
+synoP=["correct", "right", "true", "evidence" "accurate"]
+synoN=["incorrect", "false", "fake", "wrong"]
+synoMix=["uncertain", "quite", "necessarily"]
 
 ponctuation=[".",",","!",";","?"]
 conclusion="It’s not clear how long the virus can ‘survive’ on hands, but hand sanitiser with at least 60% alcohol is a good second choice to washing your hands with soap and water."
-conclusion1="That is correct, but that doesn’t mean that Dettol spray can kill the new coronavirus identified in Wuhan. Coronavirus is a category of viruses that includes the common cold, and it is likely this the label is referring to."
-conclusion2="While it is true that China has over 100,000 towers, it is unclear if it was the first place to pass this number."
-conclusion3="This claim hasn’t been substantiated and we’ve not seen wider evidence for this. In 2016, 85% of goods which left Belfast port went to the UK, measured by their weight. 56% of all Northern Irish goods sold beyond its borders went to Great Britain, based on the value of those goods."
+conclusion1="That is correct, that doesn’t mean that Dettol spray can kill the new coronavirus identified in Wuhan. Coronavirus is a category of viruses that includes the common cold, and it is likely this the label is referring to."
+conclusion2="Not quite, the exact fall depends which currency you compare it to. It’s fallen by 12% against the Euro and 5% against the US Dollar since May 2016."
+conclusion3="This is uncertain. When IMF said the pound was overvalued, they based their recommendations on the assumption that the UK would vote to remain in the EU. It's open to debate what value the pound should be at now that we've voted to leave."
 mixture_words=["but", "however"]
 negation=["no", "not","neither", "nor"]
 
@@ -87,7 +85,7 @@ def detectionNegationDirect(tempo):
                 if tempo[t+1] in synoN:
                     return "True"
         t +=1
-    return "Untreated"
+    return "Other"
 
 
 
@@ -95,23 +93,26 @@ def detectionNegationDirect(tempo):
 def exactractionDirect(words):
     words = [t for t in words if not t in ponctuation]
     tempo=nltk.pos_tag(words)
-
+    tempoLematise=lemmatization(words)
     i=0
-    if tempo[len(tempo)-1][0]=="not" and (tempo[len(tempo)-2][1]=="MD" or tempo[len(tempo)-2][1]=="VBP"):
-    	return "False"
+    if tempoLematise[len(tempo)-1][0]=="not" and (tempoLematise[len(tempoLematise)-2][1]=="MD" or tempoLematise[len(tempoLematise)-2][1]=="VBP"):
+        return "False"
 
     while i < len(tempo):
-    	if (tempo[i][0] in synoP or tempo[i][0] in synoN) and i + 1 != len(tempo) and tempo[i+1][0] in mixture_words:
-    		return "Mixture"	
-    	else:
-    		if tempo[i][0] in synoN:
-    			return "False"
-    		else:
-    			if tempo[i][0] in synoP:
-    				return "True"
+        if (tempo[i][0] in synoP or tempo[i][0] in synoN) and i + 1 != len(tempo) and tempo[i+1][0] in mixture_words:
+            return "Mixture"
+
+        if tempo[i][0] in synoN:
+            return "False"
+
+        if tempo[i][0] in synoP:
+            return "True"
+
+        if tempo[i][0] in synoMix:
+            return "Mixture"
     			
-    	i+=1
-    return "Untreated"
+        i+=1
+    return "Other"
  
 		
 
@@ -121,25 +122,28 @@ def negationIndirecte(tempo):
     for n in neg:
         if n in synoP:
             return "False"
-        else:
-            if n in synoN:
-                return "True"
+    
+        if n in synoN:
+            return "True"
+    
+        if n in synoMix:
+            return "Mixture"
            
-    return "untreated"
+    return "Other"
 
 
 def fonctionPrincipale(conclusion):
     words=[]
     words=nettoyage(conclusion)
   
-    words=lemmatization(words)
+
 
     result=detectionNegationDirect(words)
     
-    if result=="Untreated":
+    if result=="Other":
         #words=eliminationStopWords(words)
         result=negationIndirecte(words)
-        if result=="untreated":
+        if result=="Other":
             result=exactractionDirect(words)
     return result
          
@@ -147,7 +151,9 @@ def fonctionPrincipale(conclusion):
 
 
 
-print(fonctionPrincipale(conclusion1))
+#print(fonctionPrincipale(conclusion1))
+#print(fonctionPrincipale(conclusion2))
+#print(fonctionPrincipale(conclusion3))
 
 
 
@@ -157,38 +163,4 @@ print(fonctionPrincipale(conclusion1))
 
 
 
-'''print(exactractionDirect(conclusion, ponctuation))
-print("\n")
-print(exactractionDirect(conclusion1, ponctuation))
-print("\n")
-
-ph1="It has not."
-ph2="No it won't."
-
-phrase =contractions.fix(conclusion3)
-tokens = word_tokenize(phrase)
-wordnet_lemmatizer = WordNetLemmatizer()
-lstemmed = [wordnet_lemmatizer.lemmatize(word, pos='v') for word in tokens]
-tempo=nltk.pos_tag(lstemmed)
-print("Lemmatization : \n", tempo)
-
-phrase =contractions.fix(ph1)
-tokens = word_tokenize(phrase)
-wordnet_lemmatizer = WordNetLemmatizer()
-lstemmed = [wordnet_lemmatizer.lemmatize(word, pos='v') for word in tokens]
-tempo1=nltk.pos_tag(lstemmed)
-print("Lemmatization1 : \n", tempo1)
-
-
-phrase =contractions.fix(ph2)
-tokens = word_tokenize(phrase)
-wordnet_lemmatizer = WordNetLemmatizer()
-lstemmed = [wordnet_lemmatizer.lemmatize(word, pos='v') for word in tokens]
-tempo2=nltk.pos_tag(lstemmed)
-print("Lemmatization2 : \n", tempo2)
-
-
-print(exactractionDirect(conclusion2, ponctuation))
-print("\n")
-'''
 
