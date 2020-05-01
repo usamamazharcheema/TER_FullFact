@@ -3,7 +3,7 @@ import pandas as pd
 import csv
 current_websites={
 	"english":["fullfact","snopes"],
-	"portuguese":["aosfatos","lupa","publica","g1","efarsas"],
+	"portuguese":["aosfatos","lupa","publica","efarsas"],
 	"german":["mimikama"] 
 }
 
