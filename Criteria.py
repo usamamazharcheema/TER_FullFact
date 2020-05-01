@@ -34,3 +34,4 @@ class Criteria:
 		self.website = website
 		return self
 
+#critère d'extraction.
