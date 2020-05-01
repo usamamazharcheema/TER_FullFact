@@ -4,11 +4,8 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
 import Claim as claim_obj
-from selenium import webdriver
 from nltk import word_tokenize
 import nltk
-from nltk.corpus import wordnet as wn
-from py_thesaurus import Thesaurus
 import TraitementConclusion
 import getPosts
 import additionalRows
@@ -39,7 +36,6 @@ rubriquesClaim=["economy", "health", "online", "europe"]
 
 def triClaimsParRubrique(rubri, claim):
 	global claimsParRubrique
-	print("*************** Fonction triClaimsParRubrique ******************************")
 	print(rubri)
 	listeClaims=[]
 	if (not(rubri in claimsParRubrique)):
@@ -102,7 +98,6 @@ def exactractionClaim(page,url):
 					liensRevue.append(link['href'])
 				text.append(b.get_text())
 			result= " ".join(text) 
-			#print(liensRevue)
 			claim_.setLiensRevue(liensRevue)
 			claim_.setBody(result)
 		
@@ -183,7 +178,7 @@ def get_all_claims(criteria):
 	rubriques=["/law/","/economy/", "/europe/", "/health", "/online", "/crime/", "/immigration/", "/education/"]
 
 	#le nombre de claims qu'on veut récuperer à l'extraction.
-	nbClaims=200
+	nbClaims=80
 
 
 	#scrapping du site catégorie par catégorie et rajout des uri trouvées dans "url_" pour les parcourir après.
