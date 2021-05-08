@@ -4,21 +4,18 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import dateparser
 import Claim as claim_obj
-from selenium import webdriver
 from nltk import word_tokenize
 import nltk
-from nltk.corpus import wordnet as wn
-from py_thesaurus import Thesaurus
 import TraitementConclusion
 
 
 
-
+#Fonction qui récupère les claims (ainsi que leurs métadonnées) additionnelles se trouvant sur la même page et ayant été traités par la même revue.
 def briefAdditionalRows(soup, result, url, idClaim, listeURL, rubri, motsCles, t, liensRevue, d):
-
-	claim_ =  claim_obj.Claim()	
+	
 	claim = soup.find('div', {"class": "col-xs-12 col-sm-6 col-left"})
 	if claim :
+		claim_ =  claim_obj.Claim()	
 		claim_.setSource("fullfact")
 		claim_.setUrl(url)
 		claim_.setClaim(claim.get_text().replace("\nClaim\n",""))

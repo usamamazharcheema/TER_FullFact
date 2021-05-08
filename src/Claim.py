@@ -1,6 +1,8 @@
 import sys
+
 if sys.version_info[0] >= 3:
     unicode = str
+
 class Claim:
 
 	def __init__(self):
@@ -14,7 +16,6 @@ class Claim:
 		self.url=""
 		self.rubrique=""
 		self.verdictTompo=""
-		self.html=False
 		self.idClaim=1
 		self.keyWordsRP={}
 		self.liens_revue=""
@@ -60,15 +61,16 @@ class Claim:
 	def setRubrique(self, str_):
 		self.rubrique = unicode(str_)
 
-	def setHtml(self, str_):
-		self.html = str_
-
 	def setIdClaim(self, n):
 		self.idClaim = n
 		return self
 
 	def setKeyWordsRP(self, cle, valeur):
 		self.keyWordsRP[cle]=valeur
+		return self
+
+	def setLiensRevue(self, str_):
+		self.liens_revue = unicode(str_)
 		return self
 
 	def getClaim(self):
@@ -80,21 +82,14 @@ class Claim:
 	def getUrl(self):
 		return self.url
 
-
 	def getIdClaim(self):
 		return self.idClaim
 
 	def getRubrique(self):
 		return self.rubrique
 
-	def setLiensRevue(self, str_):
-		self.liens_revue = unicode(str_)
-		return self
-
 	
-
-
-
+	#creation d'un dictionnaire d'objets claim 
 	def getDict(self):
 		dict_={}
 		dict_['source']=self.source
@@ -105,12 +100,9 @@ class Claim:
 		dict_['date']=self.date
 		dict_['url']=self.url
 		dict_['rubrique']=self.rubrique
-		dict_['verdictTompo']=self.verdictTompo
+		dict_['valeur_de_véracité']=self.verdictTompo
 		dict_['idClaim']=self.idClaim
 		dict_['related_posts']=self.related_posts
-		dict_['keyWordsRP']=self.keyWordsRP
+		dict_['keywords']=self.keyWordsRP
 		dict_['liens_revue']=self.liens_revue
-		#dict_['id']=self.composedClaim
-		if (self.html):
-			dict_['html']=self.html
 		return dict_
