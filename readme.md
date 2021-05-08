@@ -11,7 +11,7 @@ Extraction de connaissances et clusterisation des claims à partir du site brita
 
 	* Traitement des conclusions associées aux claims pour extraire la valeur de véracité. 		Nous avons pour cela développer une méthode d'éxtraction symbolique en s'appuyant sur 		des patterns que nous avons définis en analysant le site.
 	* Clusterisation des claims selon leur catégorie : Santé, Economy, Europe, Education, 		etc.
-	* Structuration des claims et de leurs méta-données en suivant le modèle de données du 		graphe de connaissances claimsKG.
+	* Structuration des claims et de leurs méta-données en suivant le modèle de données du 		graphe de connaissances [claimsKG](https://data.gesis.org/claimskg/).
 	
 	
 
